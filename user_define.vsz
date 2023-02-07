@@ -1,0 +1,44 @@
+import numpy as np
+import os
+path = os.path.join(os.path.dirname(__file__),"train")
+ImportFile(os.path.join(path,'loss.out'), 'Step,Total_Loss,L1Reg_Loss,L2Reg_Loss,RMSE_E_Train,RMSE_F_Train,RMSE_V_Train,RMSE_E_Test,RMSE_F_Test,RMSE_V_Test', linked=False, prefix='', suffix='',encoding='utf_8', renames={})
+ImportFile(os.path.join(path,'energy_test.out'), 'E_nep,E_DFT', linked=False, prefix='', suffix='',encoding='utf_8', renames={})
+ImportFile(os.path.join(path,'force_test.out'), 'f_nep,f_nep2,f_nep3,f_DFT,f_DFT2,f_DFT3', linked=False, prefix='', suffix='',encoding='utf_8', renames={})
+ImportFile(os.path.join(path,'virial_test.out'), 'V_nep,V_DFT', linked=False, prefix='', suffix='',encoding='utf_8', renames={})
+f_nep = GetData('f_nep')
+f_nep2 = GetData('f_nep2')
+f_nep3 = GetData('f_nep3')
+f_DFT = GetData('f_DFT')
+f_DFT2 = GetData('f_DFT2')
+f_DFT3 = GetData('f_DFT3')
+Step = GetData('Step')
+f_nep_tmp = np.array(list(f_nep[0])+list(f_nep2[0])+list(f_nep3[0]))
+f_DFT_tmp = np.array(list(f_DFT[0])+list(f_DFT2[0])+list(f_DFT3[0]))
+SetData('Step',np.linspace(Step[0][0],(Step[0][1]-Step[0][0])*len(Step[0]),len(Step[0])))
+SetData('f_nep',f_nep_tmp)
+SetData('f_DFT',f_DFT_tmp)
+if GetData('RMSE_V_Test')[0].min() > 1E5:
+	min1=min(GetData('RMSE_E_Test')[0].min(),GetData('RMSE_F_Test')[0].min())/10
+else:
+	min1=min(GetData('RMSE_E_Test')[0].min(),GetData('RMSE_F_Test')[0].min(),GetData('RMSE_V_Test')[0].min())/10
+Set('page1/grid1/graph1/y/min', float(min1))
+min2=min(GetData('E_nep')[0].min(),GetData('E_DFT')[0].min())
+max2=max(GetData('E_nep')[0].max(),GetData('E_DFT')[0].max())
+Set('page1/grid1/graph2/x/min', float(min2))
+Set('page1/grid1/graph2/y/min', float(min2))
+Set('page1/grid1/graph2/x/max', float(max2))
+Set('page1/grid1/graph2/y/max', float(max2))
+
+min3=min(f_nep_tmp.min(),f_DFT_tmp.min())
+max3=max(f_nep_tmp.max(),f_DFT_tmp.max())
+Set('page1/grid1/graph3/x/min', float(min3))
+Set('page1/grid1/graph3/y/min', float(min3))
+Set('page1/grid1/graph3/x/max', float(max3))
+Set('page1/grid1/graph3/y/max', float(max3))
+
+min4=min(GetData('V_nep')[0].min(),GetData('V_DFT')[0].min())
+max4=max(GetData('V_nep')[0].max(),GetData('V_DFT')[0].max())
+Set('page1/grid1/graph4/x/min', float(min4))
+Set('page1/grid1/graph4/y/min', float(min4))
+Set('page1/grid1/graph4/x/max', float(max4))
+Set('page1/grid1/graph4/y/max', float(max4))
